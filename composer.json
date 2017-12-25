@@ -42,6 +42,9 @@
         }
     },
     "extra": {
+        "branch-alias": {
+            "dev-master": "1.0.x-dev"
+        },
         "laravel": {
             "providers": [
                 "App\\AutoSync\\Providers\\SqlLogServiceProvider"
