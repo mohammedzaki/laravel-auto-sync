@@ -1,0 +1,9 @@
+/vendor
+composer.phar
+composer.lock
+.DS_Store
+Thumbs.db
+.idea
+/nbproject/private/
+nbproject/project.properties
+nbproject/project.xml
