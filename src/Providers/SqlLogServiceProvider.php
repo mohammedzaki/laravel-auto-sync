@@ -24,7 +24,7 @@
  * THE SOFTWARE.
  */
 
-namespace App\AutoSync\Providers;
+namespace AutoSync\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use DB;

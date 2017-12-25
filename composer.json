@@ -50,5 +50,6 @@
                 "AutoSync\\Providers\\SqlLogServiceProvider"
             ]
         }
-    }
+    },
+    "minimum-stability": "stable"
 }
