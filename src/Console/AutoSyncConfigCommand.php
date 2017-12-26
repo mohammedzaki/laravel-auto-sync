@@ -50,8 +50,8 @@ class AutoSyncConfigCommand extends Command {
      * @var string
      */
     protected $signature = 'autosync:install '
-            . '{--' . static::SERVER_ID . '= : The ID of the server} '
-            . '{--' . static::SERVER_NAME . '= : The NAME of the server}';
+            . '{--' . AutoSyncConfigCommand::SERVER_ID . '= : The ID of the server} '
+            . '{--' . AutoSyncConfigCommand::SERVER_NAME . '= : The NAME of the server}';
 
     /**
      * The console command description.
@@ -99,8 +99,8 @@ class AutoSyncConfigCommand extends Command {
      */
     public function handle()
     {
-        $this->serverId = $this->argument(static::SERVER_ID);
-        $this->serverName = $this->argument(static::SERVER_NAME);
+        $this->serverId = $this->argument(AutoSyncConfigCommand::SERVER_ID);
+        $this->serverName = $this->argument(AutoSyncConfigCommand::SERVER_NAME);
         $this->setupFolders->createFolders();
     }
 
