@@ -36,8 +36,8 @@ use AutoSync\Filesystem\SetupFolders;
  */
 class AutoSyncConfigCommand extends Command {
 
-    const SERVER_ID   = 'server_id';
-    const SERVER_NAME = 'server_name';
+    const SERVER_ID   = 'server-id';
+    const SERVER_NAME = 'server-name';
 
     /**
      * SetupFolders .
@@ -94,8 +94,8 @@ class AutoSyncConfigCommand extends Command {
      */
     public function handle()
     {
-        $this->serverId = $this->argument(AutoSyncConfigCommand::SERVER_ID);
-        $this->serverName = $this->argument(AutoSyncConfigCommand::SERVER_NAME);
+        $this->serverId = $this->option(AutoSyncConfigCommand::SERVER_ID);
+        $this->serverName = $this->option(AutoSyncConfigCommand::SERVER_NAME);
         $this->setupFolders->createFolders();
     }
 
