@@ -29,13 +29,14 @@ namespace AutoSync\Providers;
 use Illuminate\Support\ServiceProvider;
 use DB;
 use AutoSync\SqlLogger;
+use AutoSync\Console\AutoSyncConfigCommand;
 
 /**
- * Description of SqlLogServiceProvider
+ * Description of AutoSyncServiceProvider
  *
  * @author Mohammed Zaki mohammedzaki.dev@gmail.com
  */
-class SqlLogServiceProvider extends ServiceProvider {
+class AutoSyncServiceProvider extends ServiceProvider {
 
     /**
      *
@@ -58,6 +59,7 @@ class SqlLogServiceProvider extends ServiceProvider {
     {
         $this->publishConfig();
         $this->setQueryListener();
+        $this->registerCommands();
     }
 
     /**
@@ -108,6 +110,15 @@ class SqlLogServiceProvider extends ServiceProvider {
         $this->mergeConfigFrom(
                 __DIR__ . '/../config/config.php', 'autosync'
         );
+    }
+
+    private function registerCommands()
+    {
+        if ($this->app->runningInConsole()) {
+            $this->commands([
+                AutoSyncConfigCommand::class
+            ]);
+        }
     }
 
 }

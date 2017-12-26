@@ -47,7 +47,7 @@
         },
         "laravel": {
             "providers": [
-                "AutoSync\\Providers\\SqlLogServiceProvider"
+                "AutoSync\\Providers\\AutoSyncServiceProvider"
             ]
         }
     },
