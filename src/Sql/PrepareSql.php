@@ -35,6 +35,7 @@ class PrepareSql {
     
     public function prepare($sqlQuery, $bindings)
     {
+        
         foreach ($bindings as $binding) :
             $sqlQuery = preg_replace("#\?#", is_numeric($binding) ? $binding : "'" . $binding . "'", $sqlQuery, 1);
         endforeach;
