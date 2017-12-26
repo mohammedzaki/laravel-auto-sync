@@ -7,14 +7,13 @@
  * @license MIT
  * @package mohammed-zaki/laravel-auto-sync
  */
-
 return [
-    'server'    => [
-        'id'   => 01,
-        'name' => 'server_name',
+    'server'      => [
+        'id'   => env('AUTO_SYNC_SERVER_ID', 00),
+        'name' => env('AUTO_SYNC_SERVER_NAME', 'server-name'),
     ],
     'main_folder' => storage_path('sync'),
-    'channel'     => 'hospital',
+    'channel'     => config('autosync.server.name') . '-' . config('autosync.server.id'),
     'folders'     => [
         'current_logger'  => 'logger',
         'current_syncing' => 'syncing',

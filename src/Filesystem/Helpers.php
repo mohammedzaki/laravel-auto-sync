@@ -26,6 +26,8 @@
 
 namespace AutoSync\Filesystem;
 
+use File;
+
 /**
  * Description of Helpers
  *

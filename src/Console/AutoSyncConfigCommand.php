@@ -97,6 +97,7 @@ class AutoSyncConfigCommand extends Command {
         $this->serverId = $this->option(AutoSyncConfigCommand::SERVER_ID);
         $this->serverName = $this->option(AutoSyncConfigCommand::SERVER_NAME);
         $this->setupFolders->createFolders();
+        $this->info('Auto sync library has been initialized.');
     }
 
 }

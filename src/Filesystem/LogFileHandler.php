@@ -37,15 +37,7 @@ class LogFileHandler {
 
     public function getCurrentLogFile()
     {
-        //$this->setCurrentLogState(self::CURRENT_INDEX, '00000001');
-
-        $fullPath = Helpers::getCurrentLogFilePath();
-
-        if (!file_exists($fullPath)) {
-            File::prepend($fullPath, '/* start index: 00000001*/ \n\r');
-        }
-
-        return $fullPath;
+        return Helpers::getCurrentLogFilePath();
     }
 
 }

@@ -47,7 +47,7 @@ class SetupFolders {
     private function createGitIgnore($directory)
     {
         $fullPath = $directory . '/.gitignore';
-        File::put($fullPath, '* \n !.gitignore');
+        File::put($fullPath, "* \n*.json\n!.gitignore");
     }
 
     private function createMainDirectory()
@@ -81,6 +81,14 @@ class SetupFolders {
         }
     }
 
+    private function createLogCurrentFile()
+    {
+        $fullPath = Helpers::getCurrentLogFilePath();
+        if (!file_exists($fullPath)) {
+            File::prepend($fullPath, "/* start index: 00000001 */ \n");
+        }
+    }
+
     public function createFolders()
     {
         $this->createMainDirectory();
@@ -88,5 +96,7 @@ class SetupFolders {
         $this->createCurrentSyncingDirectory();
         $this->createSyncedDirectory();
         $this->createLogCurrentStateFile();
+        $this->createLogCurrentFile();
     }
+
 }
