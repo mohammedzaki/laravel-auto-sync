@@ -36,14 +36,16 @@ use AutoSync\Filesystem\SetupFolders;
  */
 class AutoSyncConfigCommand extends Command {
 
-    /**
-     * @var SetupFolders
-     */
-    private $setupFolders;
-
     const SERVER_ID   = 'server_id';
     const SERVER_NAME = 'server_name';
 
+    /**
+     * SetupFolders .
+     *
+     * @var SetupFolders
+     */
+    private $setupFolders;
+    
     /**
      * The name and signature of the console command.
      *
@@ -73,14 +75,7 @@ class AutoSyncConfigCommand extends Command {
      * @var string
      */
     protected $serverId;
-
-    /**
-     * SetupFolders .
-     *
-     * @var SetupFolders
-     */
-    protected $setupFolders;
-
+    
     /**
      * Create a new command instance.
      *
