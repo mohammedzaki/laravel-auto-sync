@@ -32,6 +32,8 @@ use AutoSync\Format\SqlLineFormat;
 use AutoSync\Sql\PrepareSql;
 use AutoSync\Sql\SqlChecker;
 use AutoSync\Filesystem\LogFileHandler;
+use AutoSync\Filesystem\Constants;
+use AutoSync\Filesystem\Helpers;
 
 /**
  * Description of SqlLogger
@@ -66,19 +68,23 @@ class SqlLogger {
 
     public function log($sql, $bindings)
     {
-        if ($this->sqlChecker->isDML($sql)) {
+        if ($this->sqlChecker->isDML($sql) && $this->sqlChecker->checkIgnoredTable($sql)) {
             $sqlQuery = $this->prepareSql->prepare($sql, $bindings);
-            // create a log channel
-            $log      = new Logger(config('autosync.channel'));
+
             // Create a handler
-            $stream   = new StreamHandler($this->logFileHandler->getCurrentLogFile(), Logger::INFO);
+            $stream = new StreamHandler($this->logFileHandler->getCurrentLogFile(), Logger::INFO);
             $stream->setFormatter(new SqlLineFormat());
 
+            // create a log channel
+            $log = new Logger(Constants::CHANNEL);
             $log->pushHandler($stream);
 
             // add records to the log
-            $log->info($sqlQuery);
+            $log->info($sqlQuery, ['index' => $this->logFileHandler->getNewRecord()]);
+            Helpers::encryptLogFile();
         }
     }
+
+    
 
 }
