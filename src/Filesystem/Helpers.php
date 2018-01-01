@@ -27,7 +27,8 @@
 namespace AutoSync\Filesystem;
 
 use File;
-
+use AutoSync\Filesystem\Constants;
+use Illuminate\Support\Facades\Crypt;
 /**
  * Description of Helpers
  *
@@ -35,43 +36,63 @@ use File;
  */
 class Helpers {
 
-    const MAIN_FOLDER            = 'autosync.main_folder';
-    const CURRENT_LOGGER_FOLDER  = 'autosync.folders.current_logger';
-    const CURRENT_SYNCING_FOLDER = 'autosync.folders.current_syncing';
-    const SYNCED_FOLDER          = 'autosync.folders.synced';
-    const FILE_PREFIX            = 'autosync.file.prefix';
-    const FILE_CURRENT_STATE     = 'autosync.file.current_state';
-    const CURRENT_INDEX          = 'current_index';
-    const CURRENT_SYNCING        = 'current_syncing';
-    const CURRENT_RECORD         = 'current_record';
-
     static function getMainDirectory()
     {
-        return config(static::MAIN_FOLDER);
+        return config(Constants::MAIN_FOLDER);
     }
 
     static function getLoggerDirectory()
     {
-        $directory = static::getMainDirectory() . '/' . config(static::CURRENT_LOGGER_FOLDER);
+        $directory = static::getMainDirectory() . '/' . config(Constants::CURRENT_LOGGER_FOLDER);
         return $directory;
     }
 
     static function getCurrentSyncingDirectory()
     {
-        $directory = static::getMainDirectory() . '/' . config(static::CURRENT_SYNCING_FOLDER);
+        $directory = static::getMainDirectory() . '/' . config(Constants::CURRENT_SYNCING_FOLDER);
         return $directory;
     }
 
     static function getSyncedDirectory()
     {
-        $directory = static::getMainDirectory() . '/' . config(static::SYNCED_FOLDER);
+        $directory = static::getMainDirectory() . '/' . config(Constants::SYNCED_FOLDER);
         return $directory;
+    }
+
+    private static function convertIndexToName($index)
+    {
+        return sprintf("%08d", $index);
+    }
+
+    static function getNewLogFileIndex()
+    {
+        $fileIndex = static::getCurrentLogState(Constants::CURRENT_FILE_INDEX) + 1;
+        static::setCurrentLogState(Constants::CURRENT_FILE_INDEX, $fileIndex);
+        return static::convertIndexToName($fileIndex);
+    }
+
+    static function getNewLogName()
+    {
+        $fileName = config(Constants::FILE_PREFIX) . '_' . config(Constants::SERVER_NAME) . '_' . config(Constants::SERVER_ID) . '_' . static::getNewLogFileIndex() . '.log';
+        return $fileName;
+    }
+
+    static function getCurrentLogFileIndex()
+    {
+        $fileIndex = static::getCurrentLogState(Constants::CURRENT_FILE_INDEX);
+        return static::convertIndexToName($fileIndex);
     }
 
     static function getCurrentLogName()
     {
-        $fileName = config(static::FILE_PREFIX) . '_' . static::getCurrentLogState(self::CURRENT_INDEX) . '.log';
+        $fileName = config(Constants::FILE_PREFIX) . '_' . config(Constants::SERVER_NAME) . '_' . config(Constants::SERVER_ID) . '_' . static::getCurrentLogFileIndex() . '.log';
         return $fileName;
+    }
+
+    static function getNewLogFilePath()
+    {
+        $path = Helpers::getLoggerDirectory() . '/' . Helpers::getNewLogName();
+        return $path;
     }
 
     static function getCurrentLogFilePath()
@@ -82,7 +103,7 @@ class Helpers {
 
     static function getCurrentLogStateFile()
     {
-        $path = static::getMainDirectory() . '/' . config(static::FILE_CURRENT_STATE) . '.json';
+        $path = static::getMainDirectory() . '/' . config(Constants::FILE_CURRENT_STATE) . '.json';
         return $path;
     }
 
@@ -103,4 +124,63 @@ class Helpers {
         return $data->get($key);
     }
 
+    static function setEnvironmentValue($data = array())
+    {
+        $envPath = base_path('.env');
+        if (count($data) > 0) {
+
+            // Read .env-file
+            $env = file_get_contents($envPath);
+
+            // Split string on every " " and write into array
+            $env = preg_split('/\s/', $env);
+            
+            // Loop through given data
+            foreach ((array) $data as $key => $value) {
+
+                // Loop through .env-data
+                foreach ($env as $env_key => $env_value) {
+
+                    // Turn the value into an array and stop after the first split
+                    // So it's not possible to split e.g. the App-Key by accident
+                    $entry = explode("=", $env_value, 2);
+
+                    // Check, if new key fits the actual .env-key
+                    if ($entry[0] == $key) {
+                        // If yes, overwrite it with the new one
+                        $env[$env_key] = $key . "=" . $value;
+                    } else {
+                        // If not, keep the old one
+                        $env[$env_key] = $env_value;
+                    }
+                }
+            }
+
+            // Turn the array back to an String
+            $env = implode("\n", $env);
+
+            // And overwrite the .env with the new data
+            file_put_contents($envPath, $env);
+
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    static function decryptLogFile()
+    {
+        $path      = static::getCurrentLogFilePath();
+        $content   = File::get($path);
+        $decrypted = Crypt::decryptString($content);
+        File::put($path, $decrypted);
+    }
+
+    static function encryptLogFile()
+    {
+        $path      = static::getCurrentLogFilePath();
+        $content   = File::get($path);
+        $encrypted = Crypt::encryptString($content);
+        File::put($path, $encrypted);
+    }
 }
