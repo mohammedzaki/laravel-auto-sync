@@ -28,6 +28,8 @@ namespace AutoSync\Console;
 
 use Illuminate\Console\Command;
 use AutoSync\Filesystem\SetupFolders;
+use AutoSync\Filesystem\Helpers;
+use AutoSync\Filesystem\Constants;
 
 /**
  * Description of LogFileHandler
@@ -45,7 +47,7 @@ class AutoSyncConfigCommand extends Command {
      * @var SetupFolders
      */
     private $setupFolders;
-    
+
     /**
      * The name and signature of the console command.
      *
@@ -75,7 +77,7 @@ class AutoSyncConfigCommand extends Command {
      * @var string
      */
     protected $serverId;
-    
+
     /**
      * Create a new command instance.
      *
@@ -94,9 +96,13 @@ class AutoSyncConfigCommand extends Command {
      */
     public function handle()
     {
-        $this->serverId = $this->option(AutoSyncConfigCommand::SERVER_ID);
+        $this->serverId   = $this->option(AutoSyncConfigCommand::SERVER_ID);
         $this->serverName = $this->option(AutoSyncConfigCommand::SERVER_NAME);
         $this->setupFolders->createFolders();
+        Helpers::setEnvironmentValue([
+            Constants::ENV_AUTO_SYNC_SERVER_ID   => $this->serverId,
+            Constants::ENV_AUTO_SYNC_SERVER_NAME => $this->serverName
+        ]);
         $this->info('Auto sync library has been initialized.');
     }
 
