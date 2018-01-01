@@ -27,6 +27,8 @@
 namespace AutoSync\Filesystem;
 
 use File;
+use AutoSync\Filesystem\Constants;
+use AutoSync\Filesystem\LogFileHandler;
 
 /**
  * Description of SetupFolders
@@ -72,21 +74,22 @@ class SetupFolders {
 
     private function createLogCurrentStateFile()
     {
-        $path                    = Helpers::getCurrentLogStateFile();
-        $data['current_index']   = '00000001';
-        $data['current_syncing'] = '';
-        $data['current_record']  = 0;
+        $path                                = Helpers::getCurrentLogStateFile();
+        $data[Constants::CURRENT_FILE_INDEX] = 0;
+        $data[Constants::CURRENT_SYNCING]    = '';
+        $data[Constants::CURRENT_RECORD]     = 0;
         if (!File::exists($path)) {
             File::put($path, json_encode(collect($data)));
         }
     }
 
-    private function createLogCurrentFile()
+    public function createNewLogFile()
     {
-        $fullPath = Helpers::getCurrentLogFilePath();
+        $fullPath = Helpers::getNewLogFilePath();
         if (!file_exists($fullPath)) {
-            File::prepend($fullPath, "/* start index: 00000001 */ \n");
+            File::prepend($fullPath, "/* start index: " . Helpers::getCurrentLogFileIndex() . " */ \n");
         }
+        Helpers::encryptLogFile();
     }
 
     public function createFolders()
@@ -96,7 +99,7 @@ class SetupFolders {
         $this->createCurrentSyncingDirectory();
         $this->createSyncedDirectory();
         $this->createLogCurrentStateFile();
-        $this->createLogCurrentFile();
+        $this->createNewLogFile();
     }
 
 }
