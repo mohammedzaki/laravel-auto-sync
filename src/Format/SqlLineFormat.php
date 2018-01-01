@@ -41,7 +41,7 @@ class SqlLineFormat extends LineFormatter {
      */
     public function __construct($format = null, $dateFormat = null)
     {
-        $output = $format ?: "/* %datetime% > %channel% */ %message% ;\n";
+        $output = $format ?: "/* %datetime% > SERVER: %channel% > %context% */ %message% ;\n";
         parent::__construct($output, $dateFormat);
     }
     
