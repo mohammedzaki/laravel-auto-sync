@@ -26,6 +26,8 @@
 
 namespace AutoSync\Sql;
 
+use AutoSync\Filesystem\Constants;
+
 /**
  * Description of SqlChecker
  *
@@ -35,17 +37,24 @@ class SqlChecker {
 
     public function isDML($query)
     {
-        if ($this->strContains($query, ['insert', 'into', 'values'])) {
+        if ($this->strContainsAll($query, ['insert', 'into', 'values'])) {
             return TRUE;
-        } else if ($this->strContains($query, ['update', 'set'])) {
+        } else if ($this->strContainsAll($query, ['update', 'set', '='])) {
             return TRUE;
-        } else if ($this->strContains($query, ['delete', 'from'])) {
+        } else if ($this->strContainsAll($query, ['delete', 'from'])) {
             return TRUE;
+        } else if ($this->strContainsAll($query, ['create', 'table'])) {
+            return FALSE;
         }
         return FALSE;
     }
 
-    private function strContains($str, array $needles)
+    public function checkIgnoredTable($query)
+    {
+        return !$this->strContainsAny($query, config(Constants::IGNORED_TABLES));
+    }
+
+    private function strContainsAll($str, array $needles)
     {
         foreach ($needles as $needle) {
             if (!str_contains($str, $needle)) {
@@ -53,6 +62,16 @@ class SqlChecker {
             }
         }
         return TRUE;
+    }
+
+    private function strContainsAny($str, array $needles)
+    {
+        foreach ($needles as $needle) {
+            if (str_contains($str, $needle)) {
+                return TRUE;
+            }
+        }
+        return FALSE;
     }
 
 }
