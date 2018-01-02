@@ -56,16 +56,16 @@ class AutoSyncController extends Controller {
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
-     * @Post("/pushNewSyncFile")
      */
     public function pushNewSyncFile(Request $request)
     {
-        $logFile = Input::file('logFile');
+        $logFile = Input::file(Constants::API_LOG_FILE);
         $path    = Helpers::getCurrentSyncingDirectory() . '/' . $logFile->getClientOriginalName();
         File::put($path, File::get($logFile));
         ProcessSyncLogFile::dispatch($path)
-                ->delay(now()->addMinutes(2));
-                //->onQueue(config(Constants::SYNC_QUEUE_NAME));
+                ->onConnection(config(Constants::SYNC_QUEUE_DRIVER))
+                ->onQueue(config(Constants::SYNC_QUEUE_NAME))
+                ->delay(now()->addMinutes(config(Constants::SYNC_QUEUE_DELAY)));
         return "True";
     }
 
