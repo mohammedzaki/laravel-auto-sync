@@ -28,14 +28,13 @@ namespace AutoSync\Filesystem;
 
 use File;
 use AutoSync\Filesystem\Constants;
-use AutoSync\Filesystem\LogFileHandler;
 
 /**
  * Description of SetupFolders
  *
  * @author Mohammed Zaki mohammedzaki.dev@gmail.com
  */
-class SetupFolders {
+class FolderCreator {
 
     private function createDirectory($directory)
     {
@@ -92,7 +91,7 @@ class SetupFolders {
         Helpers::encryptLogFile();
     }
 
-    public function createFolders()
+    public function createAllFolders()
     {
         $this->createMainDirectory();
         $this->createLoggerDirectory();

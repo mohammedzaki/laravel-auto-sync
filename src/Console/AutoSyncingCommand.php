@@ -24,16 +24,17 @@
  * THE SOFTWARE.
  */
 
-namespace AutoSync\Filesystem;
+namespace AutoSync\Console;
 
-use AutoSync\Filesystem\Constants;
+use Illuminate\Console\Command;
+use AutoSync\Filesystem\FolderCreator;
 
 /**
- * Description of LogFileHandler
+ * Description of AutoSyncingCommand
  *
  * @author Mohammed Zaki mohammedzaki.dev@gmail.com
  */
-class LogFileHandler {
+class AutoSyncingCommand extends Command {
 
     /**
      * SetupFolders .
@@ -43,48 +44,38 @@ class LogFileHandler {
     private $folderCreator;
 
     /**
+     * The name and signature of the console command.
+     *
+     * @var string
+     */
+    protected $signature = 'autosync:start-sync';
+
+    /**
+     * The console command description.
+     *
+     * @var string
+     */
+    protected $description = 'start auto sync process';
+
+    /**
      * Create a new command instance.
      *
      * @return void
      */
-    public function __construct()
+    public function __construct(FolderCreator $folderCreator)
     {
-        $this->folderCreator = new FolderCreator();
+        parent::__construct();
+        $this->folderCreator = $folderCreator;
     }
 
-    public function getCurrentLogFile()
+    /**
+     * Execute the console command.
+     *
+     * @return mixed
+     */
+    public function handle()
     {
-        if (!$this->checkMaxRecords()) {
-            $this->createNewLogFile();
-        }
-        Helpers::decryptLogFile();
-        return Helpers::getCurrentLogFilePath();
-    }
-
-    public function createNewLogFile()
-    {
-        Helpers::setCurrentLogState(Constants::CURRENT_RECORD, 0);
-        $this->folderCreator->createNewLogFile();
-    }
-
-    public function getMaxRecord()
-    {
-        return Helpers::getCurrentLogState(Constants::CURRENT_RECORD);
-    }
-
-    public function getNewRecord()
-    {
-        $newRecord = $this->getMaxRecord() + 1;
-        Helpers::setCurrentLogState(Constants::CURRENT_RECORD, $newRecord);
-        return $newRecord;
-    }
-
-    public function checkMaxRecords()
-    {
-        if ($this->getMaxRecord() < config(Constants::MAX_RECORDS)) {
-            return TRUE;
-        }
-        return FALSE;
+        logger("auto sync process started in file 00");
     }
 
 }

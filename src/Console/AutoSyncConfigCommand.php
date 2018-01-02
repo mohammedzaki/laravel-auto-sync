@@ -27,12 +27,12 @@
 namespace AutoSync\Console;
 
 use Illuminate\Console\Command;
-use AutoSync\Filesystem\SetupFolders;
+use AutoSync\Filesystem\FolderCreator;
 use AutoSync\Filesystem\Helpers;
 use AutoSync\Filesystem\Constants;
 
 /**
- * Description of LogFileHandler
+ * Description of AutoSyncConfigCommand
  *
  * @author Mohammed Zaki mohammedzaki.dev@gmail.com
  */
@@ -44,9 +44,9 @@ class AutoSyncConfigCommand extends Command {
     /**
      * SetupFolders .
      *
-     * @var SetupFolders
+     * @var FolderCreator
      */
-    private $setupFolders;
+    private $folderCreator;
 
     /**
      * The name and signature of the console command.
@@ -83,10 +83,10 @@ class AutoSyncConfigCommand extends Command {
      *
      * @return void
      */
-    public function __construct(SetupFolders $setupFolders)
+    public function __construct(FolderCreator $folderCreator)
     {
         parent::__construct();
-        $this->setupFolders = $setupFolders;
+        $this->folderCreator = $folderCreator;
     }
 
     /**
@@ -98,7 +98,7 @@ class AutoSyncConfigCommand extends Command {
     {
         $this->serverId   = $this->option(AutoSyncConfigCommand::SERVER_ID);
         $this->serverName = $this->option(AutoSyncConfigCommand::SERVER_NAME);
-        $this->setupFolders->createFolders();
+        $this->folderCreator->createAllFolders();
         Helpers::setEnvironmentValue([
             Constants::ENV_AUTO_SYNC_SERVER_ID   => $this->serverId,
             Constants::ENV_AUTO_SYNC_SERVER_NAME => $this->serverName
