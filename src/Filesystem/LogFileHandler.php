@@ -27,6 +27,7 @@
 namespace AutoSync\Filesystem;
 
 use AutoSync\Utils\Constants;
+use AutoSync\Utils\Helpers;
 
 /**
  * Description of LogFileHandler
