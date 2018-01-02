@@ -112,7 +112,7 @@ class AutoSyncServiceProvider extends ServiceProvider {
     private function mergeConfig()
     {
         $this->mergeConfigFrom(
-                __DIR__ . '/../config/config.php', 'autosync'
+                __DIR__ . '/../config/autosync.php', 'autosync'
         );
     }
 
