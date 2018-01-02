@@ -43,6 +43,7 @@ class Constants {
     const FILE_CURRENT_STATE        = 'autosync.file.current_state';
     const MAX_RECORDS               = 'autosync.file.max_records';
     const IGNORED_TABLES            = 'autosync.ignored_tables';
+    const SYNC_SCHEDULE_TIME        = 'autosync.sync_schedule_time';
     const CHANNEL                   = 'autosync.channel';
     const CURRENT_FILE_INDEX        = 'current_index';
     const CURRENT_SYNCING           = 'current_syncing';

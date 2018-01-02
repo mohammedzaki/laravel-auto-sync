@@ -30,6 +30,9 @@ use Illuminate\Support\ServiceProvider;
 use DB;
 use AutoSync\SqlLogger;
 use AutoSync\Console\AutoSyncConfigCommand;
+use AutoSync\Console\AutoSyncingCommand;
+use Illuminate\Console\Scheduling\Schedule;
+use AutoSync\Filesystem\Constants;
 
 /**
  * Description of AutoSyncServiceProvider
@@ -60,6 +63,7 @@ class AutoSyncServiceProvider extends ServiceProvider {
         $this->publishConfig();
         $this->setQueryListener();
         $this->registerCommands();
+        $this->registerSchedulingCommands();
     }
 
     /**
@@ -116,9 +120,20 @@ class AutoSyncServiceProvider extends ServiceProvider {
     {
         if ($this->app->runningInConsole()) {
             $this->commands([
-                AutoSyncConfigCommand::class
+                AutoSyncConfigCommand::class,
+                AutoSyncingCommand::class
             ]);
         }
+    }
+
+    private function registerSchedulingCommands()
+    {
+        $this->app->booted(function () {
+            $schedule = $this->app->make(Schedule::class);
+            if ($schedule instanceof Schedule) {
+                $schedule->command('autosync:start-sync')->cron(config(Constants::SYNC_SCHEDULE_TIME))->withoutOverlapping();
+            }
+        });
     }
 
 }

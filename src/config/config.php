@@ -8,23 +8,24 @@
  * @package mohammed-zaki/laravel-auto-sync
  */
 return [
-    'server'         => [
+    'server'             => [
         'id'   => env('AUTO_SYNC_SERVER_ID', 00),
         'name' => env('AUTO_SYNC_SERVER_NAME', 'server-name'),
     ],
-    'main_folder'    => storage_path('sync'),
-    'channel'        => env('AUTO_SYNC_SERVER_NAME', 'server-name') . '-' . env('AUTO_SYNC_SERVER_ID', 00),
-    'folders'        => [
+    'main_folder'        => storage_path('sync'),
+    'channel'            => env('AUTO_SYNC_SERVER_NAME', 'server-name') . '-' . env('AUTO_SYNC_SERVER_ID', 00),
+    'folders'            => [
         'current_logger'  => 'logger',
         'current_syncing' => 'syncing',
         'synced'          => 'synced'
     ],
-    'file'           => [
+    'sync_schedule_time' => '* */10 * * * *',
+    'file'               => [
         'prefix'        => 'bin',
         'current_state' => 'current',
         'max_records'   => '50',
     ],
-    'ignored_tables' => [
+    'ignored_tables'     => [
         '`oauth_access_tokens`',
         '`oauth_auth_codes`',
         '`oauth_clients`',
