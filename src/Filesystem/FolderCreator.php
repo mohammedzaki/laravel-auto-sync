@@ -27,7 +27,8 @@
 namespace AutoSync\Filesystem;
 
 use File;
-use AutoSync\Filesystem\Constants;
+use AutoSync\Utils\Constants;
+use AutoSync\Utils\Helpers;
 
 /**
  * Description of SetupFolders

@@ -24,7 +24,7 @@
  * THE SOFTWARE.
  */
 
-namespace AutoSync\Filesystem;
+namespace AutoSync\Utils;
 
 /**
  * Description of Constants

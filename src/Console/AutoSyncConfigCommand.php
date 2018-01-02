@@ -28,8 +28,8 @@ namespace AutoSync\Console;
 
 use Illuminate\Console\Command;
 use AutoSync\Filesystem\FolderCreator;
-use AutoSync\Filesystem\Helpers;
-use AutoSync\Filesystem\Constants;
+use AutoSync\Utils\Helpers;
+use AutoSync\Utils\Constants;
 
 /**
  * Description of AutoSyncConfigCommand

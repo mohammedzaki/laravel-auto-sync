@@ -32,8 +32,8 @@ use AutoSync\Format\SqlLineFormat;
 use AutoSync\Sql\PrepareSql;
 use AutoSync\Sql\SqlChecker;
 use AutoSync\Filesystem\LogFileHandler;
-use AutoSync\Filesystem\Constants;
-use AutoSync\Filesystem\Helpers;
+use AutoSync\Utils\Constants;
+use AutoSync\Utils\Helpers;
 
 /**
  * Description of SqlLogger

@@ -24,17 +24,23 @@
  * THE SOFTWARE.
  */
 
-namespace AutoSync\Filesystem;
+namespace AutoSync\Utils;
 
 use File;
-use AutoSync\Filesystem\Constants;
+use AutoSync\Utils\Constants;
 use Illuminate\Support\Facades\Crypt;
+
 /**
  * Description of Helpers
  *
  * @author Mohammed Zaki mohammedzaki.dev@gmail.com
  */
 class Helpers {
+
+    private static function convertIndexToName($index)
+    {
+        return sprintf("%08d", $index);
+    }
 
     static function getMainDirectory()
     {
@@ -57,11 +63,6 @@ class Helpers {
     {
         $directory = static::getMainDirectory() . '/' . config(Constants::SYNCED_FOLDER);
         return $directory;
-    }
-
-    private static function convertIndexToName($index)
-    {
-        return sprintf("%08d", $index);
     }
 
     static function getNewLogFileIndex()
@@ -134,7 +135,7 @@ class Helpers {
 
             // Split string on every " " and write into array
             $env = preg_split('/\s/', $env);
-            
+
             // Loop through given data
             foreach ((array) $data as $key => $value) {
 
@@ -183,4 +184,5 @@ class Helpers {
         $encrypted = Crypt::encryptString($content);
         File::put($path, $encrypted);
     }
+
 }

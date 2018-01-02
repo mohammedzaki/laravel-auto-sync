@@ -32,7 +32,7 @@ use AutoSync\SqlLogger;
 use AutoSync\Console\AutoSyncConfigCommand;
 use AutoSync\Console\AutoSyncingCommand;
 use Illuminate\Console\Scheduling\Schedule;
-use AutoSync\Filesystem\Constants;
+use AutoSync\Utils\Constants;
 
 /**
  * Description of AutoSyncServiceProvider

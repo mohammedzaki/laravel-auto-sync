@@ -26,7 +26,7 @@
 
 namespace AutoSync\Sql;
 
-use AutoSync\Filesystem\Constants;
+use AutoSync\Utils\Constants;
 
 /**
  * Description of SqlChecker
