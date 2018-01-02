@@ -28,6 +28,9 @@ namespace AutoSync\Console;
 
 use Illuminate\Console\Command;
 use AutoSync\Filesystem\FolderCreator;
+use AutoSync\Utils\Helpers;
+use AutoSync\Utils\Constants;
+use GuzzleHttp\Client;
 
 /**
  * Description of AutoSyncingCommand
@@ -75,7 +78,25 @@ class AutoSyncingCommand extends Command {
      */
     public function handle()
     {
-        logger("auto sync process started in file 00");
+        logger("auto sync process started on file " . Helpers::getCurrentLogName());
+        $client = new Client();
+        $res    = $client->request('POST', config(Constants::MASTER_SERVER_URL) . config(Constants::MASTER_SERVER_SYNC_API), [
+            //'auth'      => [env('API_USERNAME'), env('API_PASSWORD')],
+            'username'  => config(Constants::MASTER_SERVER_USERNAME),
+            'password'  => config(Constants::MASTER_SERVER_PASSWORD),
+            'multipart' => [
+                [
+                    'name'     => 'logFile',
+                    'contents' => file_get_contents(Helpers::getCurrentLogFilePath()),
+                    'filename' => Helpers::getCurrentLogName()
+                ]
+            ],
+        ]);
+        if ($res->getStatusCode() == 200) {
+            logger("auto sync success on file " . Helpers::getCurrentLogName());
+        } else {
+            logger("auto sync fail on file " . Helpers::getCurrentLogName());
+        }
     }
 
 }
