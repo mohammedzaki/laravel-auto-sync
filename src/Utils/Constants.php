@@ -36,6 +36,7 @@ class Constants {
     const MAIN_FOLDER               = 'autosync.main_folder';
     const SERVER_ID                 = 'autosync.server.id';
     const SERVER_NAME               = 'autosync.server.name';
+    const SERVER_IS_MASTER          = 'autosync.server.is_master';
     const MASTER_SERVER_URL         = 'autosync.master_server.url';
     const MASTER_SERVER_USERNAME    = 'autosync.master_server.username';
     const MASTER_SERVER_PASSWORD    = 'autosync.master_server.password';

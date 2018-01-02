@@ -84,12 +84,14 @@ class AutoSyncServiceProvider extends ServiceProvider {
      */
     private function setQueryListener()
     {
-        DB::listen(function ($query) {
-            // $query->sql
-            // $query->bindings
-            // $query->time
-            $this->sqlLogger->log($query->sql, $query->bindings);
-        });
+        if (!config(Constants::SERVER_IS_MASTER)) {
+            DB::listen(function ($query) {
+                // $query->sql
+                // $query->bindings
+                // $query->time
+                $this->sqlLogger->log($query->sql, $query->bindings);
+            });
+        }
     }
 
     /**
@@ -158,7 +160,12 @@ class AutoSyncServiceProvider extends ServiceProvider {
         $this->app->booted(function () {
             $schedule = $this->app->make(Schedule::class);
             if ($schedule instanceof Schedule) {
-                $schedule->command('autosync:start-sync')->cron(config(Constants::SYNC_SCHEDULE_TIME))->withoutOverlapping();
+                if (!config(Constants::SERVER_IS_MASTER)) {
+                    //$schedule->command('autosync:start-sync')->cron(config(Constants::SYNC_SCHEDULE_TIME))->withoutOverlapping();
+                }
+                if (config(Constants::SERVER_IS_MASTER)) {
+                    //$schedule->command('queue:work ' . config(Constants::SYNC_QUEUE_DRIVER) . ' --queue=' . config(Constants::SYNC_QUEUE_NAME))->everyMinute()->withoutOverlapping();
+                }
             }
         });
     }
