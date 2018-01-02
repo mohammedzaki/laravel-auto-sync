@@ -64,6 +64,7 @@ class AutoSyncServiceProvider extends ServiceProvider {
         $this->setQueryListener();
         $this->registerCommands();
         $this->registerSchedulingCommands();
+        $this->registerRoutes();
     }
 
     /**
@@ -100,7 +101,7 @@ class AutoSyncServiceProvider extends ServiceProvider {
     {
         // Publish config files
         $this->publishes([
-            __DIR__ . '/../config/config.php' => config_path('autosync.php'),
+            __DIR__ . '/../config/autosync.php' => config_path('autosync.php'),
         ]);
     }
 
@@ -114,6 +115,32 @@ class AutoSyncServiceProvider extends ServiceProvider {
         $this->mergeConfigFrom(
                 __DIR__ . '/../config/autosync.php', 'autosync'
         );
+    }
+
+    private function registerRoutes()
+    {
+        $routeConfig = [
+            'namespace'  => 'AutoSync\Controllers',
+            'prefix'     => '',
+            'middleware' => 'api',
+        ];
+
+        $this->getRouter()->group($routeConfig, function($router) {
+            $router->post(config(Constants::MASTER_SERVER_SYNC_API), [
+                'uses' => 'AutoSyncController@pushNewSyncFile',
+                'as'   => 'autosync.pushNewSyncFile',
+            ]);
+        });
+    }
+
+    /**
+     * Get the active router.
+     *
+     * @return Router
+     */
+    private function getRouter()
+    {
+        return $this->app['router'];
     }
 
     private function registerCommands()

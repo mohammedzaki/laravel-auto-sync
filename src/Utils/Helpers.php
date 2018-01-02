@@ -72,7 +72,7 @@ class Helpers {
         return static::convertIndexToName($fileIndex);
     }
 
-    static function getNewLogName()
+    private static function getNewLogName()
     {
         $fileName = config(Constants::FILE_PREFIX) . '_' . config(Constants::SERVER_NAME) . '_' . config(Constants::SERVER_ID) . '_' . static::getNewLogFileIndex() . '.log';
         return $fileName;
@@ -169,17 +169,21 @@ class Helpers {
         }
     }
 
-    static function decryptLogFile()
+    static function decryptLogFile($path = null)
     {
-        $path      = static::getCurrentLogFilePath();
+        if ($path == null) {
+            $path = static::getCurrentLogFilePath();
+        }
         $content   = File::get($path);
         $decrypted = Crypt::decryptString($content);
         File::put($path, $decrypted);
     }
 
-    static function encryptLogFile()
+    static function encryptLogFile($path = null)
     {
-        $path      = static::getCurrentLogFilePath();
+        if ($path == null) {
+            $path = static::getCurrentLogFilePath();
+        }
         $content   = File::get($path);
         $encrypted = Crypt::encryptString($content);
         File::put($path, $encrypted);

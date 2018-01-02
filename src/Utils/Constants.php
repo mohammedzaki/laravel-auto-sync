@@ -36,6 +36,10 @@ class Constants {
     const MAIN_FOLDER               = 'autosync.main_folder';
     const SERVER_ID                 = 'autosync.server.id';
     const SERVER_NAME               = 'autosync.server.name';
+    const MASTER_SERVER_URL         = 'autosync.master_server.url';
+    const MASTER_SERVER_USERNAME    = 'autosync.master_server.username';
+    const MASTER_SERVER_PASSWORD    = 'autosync.master_server.password';
+    const MASTER_SERVER_SYNC_API    = 'autosync.master_server.sync_api_name';
     const CURRENT_LOGGER_FOLDER     = 'autosync.folders.current_logger';
     const CURRENT_SYNCING_FOLDER    = 'autosync.folders.current_syncing';
     const SYNCED_FOLDER             = 'autosync.folders.synced';
@@ -44,6 +48,7 @@ class Constants {
     const MAX_RECORDS               = 'autosync.file.max_records';
     const IGNORED_TABLES            = 'autosync.ignored_tables';
     const SYNC_SCHEDULE_TIME        = 'autosync.sync_schedule_time';
+    const SYNC_QUEUE_NAME           = 'autosync.sync_queue_name';
     const CHANNEL                   = 'autosync.channel';
     const CURRENT_FILE_INDEX        = 'current_index';
     const CURRENT_SYNCING           = 'current_syncing';

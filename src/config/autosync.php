@@ -12,6 +12,12 @@ return [
         'id'   => env('AUTO_SYNC_SERVER_ID', 00),
         'name' => env('AUTO_SYNC_SERVER_NAME', 'server-name'),
     ],
+    'master_server'      => [
+        'url'      => env('AUTO_SYNC_MASTER_SERVER_URL', ''),
+        'username' => env('AUTO_SYNC_MASTER_SERVER_USERNAME', ''),
+        'password' => env('AUTO_SYNC_MASTER_SERVER_PASSWORD', ''),
+        'sync_api_name' => '/api/autosync/pushNewSyncFile',
+    ],
     'main_folder'        => storage_path('sync'),
     'channel'            => env('AUTO_SYNC_SERVER_NAME', 'server-name') . '-' . env('AUTO_SYNC_SERVER_ID', 00),
     'folders'            => [
@@ -20,6 +26,7 @@ return [
         'synced'          => 'synced'
     ],
     'sync_schedule_time' => '*/30 */3 * * * *',
+    'sync_queue_name'    => 'autosyncprocessing',
     'file'               => [
         'prefix'        => 'bin',
         'current_state' => 'current',
