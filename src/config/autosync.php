@@ -19,7 +19,7 @@ return [
         'current_syncing' => 'syncing',
         'synced'          => 'synced'
     ],
-    'sync_schedule_time' => '* */10 * * * *',
+    'sync_schedule_time' => '*/30 */3 * * * *',
     'file'               => [
         'prefix'        => 'bin',
         'current_state' => 'current',
