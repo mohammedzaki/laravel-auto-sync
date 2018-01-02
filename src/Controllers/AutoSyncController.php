@@ -59,14 +59,18 @@ class AutoSyncController extends Controller {
      */
     public function pushNewSyncFile(Request $request)
     {
-        $logFile = Input::file(Constants::API_LOG_FILE);
-        $path    = Helpers::getCurrentSyncingDirectory() . '/' . $logFile->getClientOriginalName();
-        File::put($path, File::get($logFile));
-        ProcessSyncLogFile::dispatch($path)
-                ->onConnection(config(Constants::SYNC_QUEUE_DRIVER))
-                ->onQueue(config(Constants::SYNC_QUEUE_NAME))
-                ->delay(now()->addMinutes(config(Constants::SYNC_QUEUE_DELAY)));
-        return "True";
+        if ($request->username == config(Constants::MASTER_SERVER_USERNAME) && $request->password == config(Constants::MASTER_SERVER_PASSWORD)) {
+            $logFile = Input::file(Constants::API_LOG_FILE);
+            $path    = Helpers::getCurrentSyncingDirectory() . '/' . $logFile->getClientOriginalName();
+            File::put($path, File::get($logFile));
+            ProcessSyncLogFile::dispatch($path)
+                    ->onConnection(config(Constants::SYNC_QUEUE_DRIVER))
+                    ->onQueue(config(Constants::SYNC_QUEUE_NAME))
+                    ->delay(now()->addMinutes(config(Constants::SYNC_QUEUE_DELAY)));
+            return "True";
+        } else {
+            abort(401, 'unauthorized user');
+        }
     }
 
 }
