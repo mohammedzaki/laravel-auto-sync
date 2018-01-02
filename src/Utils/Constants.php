@@ -48,12 +48,15 @@ class Constants {
     const MAX_RECORDS               = 'autosync.file.max_records';
     const IGNORED_TABLES            = 'autosync.ignored_tables';
     const SYNC_SCHEDULE_TIME        = 'autosync.sync_schedule_time';
-    const SYNC_QUEUE_NAME           = 'autosync.sync_queue_name';
+    const SYNC_QUEUE_NAME           = 'autosync.sync_queue.name';
+    const SYNC_QUEUE_DRIVER         = 'autosync.sync_queue.driver';
+    const SYNC_QUEUE_DELAY          = 'autosync.sync_queue.delay';
     const CHANNEL                   = 'autosync.channel';
     const CURRENT_FILE_INDEX        = 'current_index';
     const CURRENT_SYNCING           = 'current_syncing';
     const CURRENT_RECORD            = 'current_record';
     const ENV_AUTO_SYNC_SERVER_ID   = 'AUTO_SYNC_SERVER_ID';
     const ENV_AUTO_SYNC_SERVER_NAME = 'AUTO_SYNC_SERVER_NAME';
+    const API_LOG_FILE              = 'logFile';
 
 }
