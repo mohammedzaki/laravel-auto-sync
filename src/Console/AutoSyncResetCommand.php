@@ -32,11 +32,11 @@ use AutoSync\Utils\Helpers;
 use AutoSync\Utils\Constants;
 
 /**
- * Description of AutoSyncConfigCommand
+ * Description of AutoSyncResetCommand
  *
  * @author Mohammed Zaki mohammedzaki.dev@gmail.com
  */
-class AutoSyncConfigCommand extends Command {
+class AutoSyncResetCommand extends Command {
 
     const SERVER_ID   = 'server-id';
     const SERVER_NAME = 'server-name';
@@ -53,7 +53,7 @@ class AutoSyncConfigCommand extends Command {
      *
      * @var string
      */
-    protected $signature = 'autosync:install '
+    protected $signature = 'autosync:reset '
             . '{--' . AutoSyncConfigCommand::SERVER_ID . '= : The ID of the server} '
             . '{--' . AutoSyncConfigCommand::SERVER_NAME . '= : The NAME of the server}';
 
@@ -98,12 +98,15 @@ class AutoSyncConfigCommand extends Command {
     {
         $this->serverId   = $this->option(AutoSyncConfigCommand::SERVER_ID);
         $this->serverName = $this->option(AutoSyncConfigCommand::SERVER_NAME);
+        Helpers::setCurrentLogState(Constants::CURRENT_FILE_INDEX, 0);
+        Helpers::setCurrentLogState(Constants::CURRENT_LOG_RECORD, 0);
+        Helpers::setCurrentLogState(Constants::CURRENT_SYNCING_FILE, '');
         $this->folderCreator->createAllFolders();
         Helpers::setEnvironmentValue([
             Constants::ENV_AUTO_SYNC_SERVER_ID   => $this->serverId,
             Constants::ENV_AUTO_SYNC_SERVER_NAME => $this->serverName
         ]);
-        $this->info('Auto-sync library has been initialized.');
+        $this->info('Auto-sync library has been reset.');
     }
 
 }

@@ -31,6 +31,7 @@ use DB;
 use AutoSync\SqlLogger;
 use AutoSync\Console\AutoSyncConfigCommand;
 use AutoSync\Console\AutoSyncingCommand;
+use AutoSync\Console\AutoSyncResetCommand;
 use Illuminate\Console\Scheduling\Schedule;
 use AutoSync\Utils\Constants;
 
@@ -150,7 +151,8 @@ class AutoSyncServiceProvider extends ServiceProvider {
         if ($this->app->runningInConsole()) {
             $this->commands([
                 AutoSyncConfigCommand::class,
-                AutoSyncingCommand::class
+                AutoSyncingCommand::class,
+                AutoSyncResetCommand::class
             ]);
         }
     }
@@ -161,7 +163,7 @@ class AutoSyncServiceProvider extends ServiceProvider {
             $schedule = $this->app->make(Schedule::class);
             if ($schedule instanceof Schedule) {
                 if (!config(Constants::SERVER_IS_MASTER)) {
-                    //$schedule->command('autosync:start-sync')->cron(config(Constants::SYNC_SCHEDULE_TIME))->withoutOverlapping();
+                    $schedule->command('autosync:start-sync')->cron(config(Constants::SYNC_SCHEDULE_TIME))->withoutOverlapping();
                 }
                 if (config(Constants::SERVER_IS_MASTER)) {
                     $schedule->command('queue:work ' . config(Constants::SYNC_QUEUE_DRIVER) . ' --queue=' . config(Constants::SYNC_QUEUE_NAME))->everyMinute()->withoutOverlapping();

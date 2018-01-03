@@ -96,7 +96,7 @@ class AutoSyncingCommand extends Command {
     private function startSyncFile($logfile)
     {
         if ($this->moveFileToSyncing($logfile)) {
-            $this->postLogFileToServer($logfile);
+            $this->postLogFileToServer(Helpers::getCurrentLogState(Constants::CURRENT_SYNCING_FILE));
         }
     }
 
@@ -106,14 +106,19 @@ class AutoSyncingCommand extends Command {
         $filename = basename($logfile);
         logger("auto sync process started on file {$filename}");
         $res      = $client->request('POST', config(Constants::MASTER_SERVER_URL) . config(Constants::MASTER_SERVER_SYNC_API), [
-            //'auth'      => [env('API_USERNAME'), env('API_PASSWORD')],
-            'username'  => config(Constants::MASTER_SERVER_USERNAME),
-            'password'  => config(Constants::MASTER_SERVER_PASSWORD),
             'multipart' => [
                 [
                     'name'     => Constants::API_LOG_FILE,
                     'contents' => File::get($logfile),
                     'filename' => $filename
+                ],
+                [
+                    'name'     => 'username',
+                    'contents' => config(Constants::MASTER_SERVER_USERNAME)
+                ],
+                [
+                    'name'     => 'password',
+                    'contents' => config(Constants::MASTER_SERVER_PASSWORD)
                 ]
             ],
         ]);
