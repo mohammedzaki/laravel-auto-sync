@@ -76,8 +76,8 @@ class FolderCreator {
     {
         $path                                = Helpers::getCurrentLogStateFile();
         $data[Constants::CURRENT_FILE_INDEX] = 0;
-        $data[Constants::CURRENT_SYNCING]    = '';
-        $data[Constants::CURRENT_RECORD]     = 0;
+        $data[Constants::CURRENT_SYNCING_FILE]    = '';
+        $data[Constants::CURRENT_LOG_RECORD]     = 0;
         if (!File::exists($path)) {
             File::put($path, json_encode(collect($data)));
         }

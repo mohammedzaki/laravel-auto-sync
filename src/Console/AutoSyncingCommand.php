@@ -31,6 +31,7 @@ use AutoSync\Filesystem\FolderCreator;
 use AutoSync\Utils\Helpers;
 use AutoSync\Utils\Constants;
 use GuzzleHttp\Client;
+use File;
 
 /**
  * Description of AutoSyncingCommand
@@ -78,24 +79,62 @@ class AutoSyncingCommand extends Command {
      */
     public function handle()
     {
-        logger("auto sync process started on file " . Helpers::getCurrentLogName());
-        $client = new Client();
-        $res    = $client->request('POST', config(Constants::MASTER_SERVER_URL) . config(Constants::MASTER_SERVER_SYNC_API), [
+        $this->syncAllLogFiles();
+    }
+
+    private function syncAllLogFiles()
+    {
+        $files = File::allFiles(Helpers::getLoggerDirectory());
+        foreach ($files as $logfile) {
+            $filename = basename($logfile);
+            if ($filename != Helpers::getCurrentLogName()) {
+                $this->startSyncFile($logfile);
+            }
+        }
+    }
+
+    private function startSyncFile($logfile)
+    {
+        if ($this->moveFileToSyncing($logfile)) {
+            $this->postLogFileToServer($logfile);
+        }
+    }
+
+    private function postLogFileToServer($logfile)
+    {
+        $client   = new Client();
+        $filename = basename($logfile);
+        logger("auto sync process started on file {$filename}");
+        $res      = $client->request('POST', config(Constants::MASTER_SERVER_URL) . config(Constants::MASTER_SERVER_SYNC_API), [
             //'auth'      => [env('API_USERNAME'), env('API_PASSWORD')],
             'username'  => config(Constants::MASTER_SERVER_USERNAME),
             'password'  => config(Constants::MASTER_SERVER_PASSWORD),
             'multipart' => [
                 [
-                    'name'     => 'logFile',
-                    'contents' => file_get_contents(Helpers::getCurrentLogFilePath()),
-                    'filename' => Helpers::getCurrentLogName()
+                    'name'     => Constants::API_LOG_FILE,
+                    'contents' => File::get($logfile),
+                    'filename' => $filename
                 ]
             ],
         ]);
         if ($res->getStatusCode() == 200) {
-            logger("auto sync success on file " . Helpers::getCurrentLogName());
+            logger("auto sync success on file {$filename}");
         } else {
-            logger("auto sync fail on file " . Helpers::getCurrentLogName());
+            logger("auto sync fail on file {$filename}");
+        }
+    }
+
+    private function moveFileToSyncing($logfile)
+    {
+        $filename    = basename($logfile);
+        $syncingfile = Helpers::getCurrentSyncingDirectory() . '/' . $filename;
+        logger("Moving logfile {$filename}");
+        if (!File::move($logfile, $syncingfile)) {
+            logger("Couldn't move file {$filename}");
+            return FALSE;
+        } else {
+            Helpers::setCurrentLogState(Constants::CURRENT_SYNCING_FILE, $syncingfile);
+            return TRUE;
         }
     }
 

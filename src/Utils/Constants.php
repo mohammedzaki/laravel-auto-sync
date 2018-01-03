@@ -54,8 +54,8 @@ class Constants {
     const SYNC_QUEUE_DELAY          = 'autosync.sync_queue.delay';
     const CHANNEL                   = 'autosync.channel';
     const CURRENT_FILE_INDEX        = 'current_index';
-    const CURRENT_SYNCING           = 'current_syncing';
-    const CURRENT_RECORD            = 'current_record';
+    const CURRENT_SYNCING_FILE      = 'current_syncing';
+    const CURRENT_LOG_RECORD        = 'current_record';
     const ENV_AUTO_SYNC_SERVER_ID   = 'AUTO_SYNC_SERVER_ID';
     const ENV_AUTO_SYNC_SERVER_NAME = 'AUTO_SYNC_SERVER_NAME';
     const API_LOG_FILE              = 'logFile';

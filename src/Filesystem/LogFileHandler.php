@@ -64,19 +64,19 @@ class LogFileHandler {
 
     public function createNewLogFile()
     {
-        Helpers::setCurrentLogState(Constants::CURRENT_RECORD, 0);
+        Helpers::setCurrentLogState(Constants::CURRENT_LOG_RECORD, 0);
         $this->folderCreator->createNewLogFile();
     }
 
     public function getMaxRecord()
     {
-        return Helpers::getCurrentLogState(Constants::CURRENT_RECORD);
+        return Helpers::getCurrentLogState(Constants::CURRENT_LOG_RECORD);
     }
 
     public function getNewRecord()
     {
         $newRecord = $this->getMaxRecord() + 1;
-        Helpers::setCurrentLogState(Constants::CURRENT_RECORD, $newRecord);
+        Helpers::setCurrentLogState(Constants::CURRENT_LOG_RECORD, $newRecord);
         return $newRecord;
     }
 

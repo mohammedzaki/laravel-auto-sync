@@ -11,7 +11,7 @@ return [
     'server'             => [
         'id'        => env('AUTO_SYNC_SERVER_ID', 00),
         'name'      => env('AUTO_SYNC_SERVER_NAME', 'server-name'),
-        'is_master' => false,
+        'is_master' => env('AUTO_SYNC_IS_MASTER_SERVER', false),
     ],
     'master_server'      => [
         'url'           => env('AUTO_SYNC_MASTER_SERVER_URL', ''),

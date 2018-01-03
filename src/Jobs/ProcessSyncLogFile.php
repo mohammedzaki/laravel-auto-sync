@@ -33,6 +33,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use AutoSync\Utils\Helpers;
 use File;
+use DB;
 
 class ProcessSyncLogFile implements ShouldQueue {
 
@@ -64,8 +65,18 @@ class ProcessSyncLogFile implements ShouldQueue {
     public function handle()
     {
         Helpers::decryptLogFile($this->logFilePath);
-        $content = File::get($this->logFilePath);
-        logger("{$this->logFilePath} staring insert to database " . $content);
+        $filename = basename($this->logFilePath);
+        $content  = File::get($this->logFilePath);
+        logger("ProcessSyncLogFile staring insert to database from file: '{$filename}'");
+        DB::beginTransaction();
+        try {
+            DB::statement($content);
+            DB::commit();
+            logger("ProcessSyncLogFile insert to database success from file: '{$filename}'");
+        } catch (\Exception $exc) {
+            DB::rollBack();
+            logger($exc->getTraceAsString());
+        }
     }
 
 }

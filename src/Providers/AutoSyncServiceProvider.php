@@ -164,7 +164,7 @@ class AutoSyncServiceProvider extends ServiceProvider {
                     //$schedule->command('autosync:start-sync')->cron(config(Constants::SYNC_SCHEDULE_TIME))->withoutOverlapping();
                 }
                 if (config(Constants::SERVER_IS_MASTER)) {
-                    //$schedule->command('queue:work ' . config(Constants::SYNC_QUEUE_DRIVER) . ' --queue=' . config(Constants::SYNC_QUEUE_NAME))->everyMinute()->withoutOverlapping();
+                    $schedule->command('queue:work ' . config(Constants::SYNC_QUEUE_DRIVER) . ' --queue=' . config(Constants::SYNC_QUEUE_NAME))->everyMinute()->withoutOverlapping();
                 }
             }
         });
