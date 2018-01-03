@@ -84,19 +84,26 @@ class AutoSyncingCommand extends Command {
 
     private function syncAllLogFiles()
     {
+        $this->moveAllLogsToSyncing();
+        $this->startSyncingAllLogs();
+    }
+
+    private function moveAllLogsToSyncing()
+    {
         $files = File::allFiles(Helpers::getLoggerDirectory());
         foreach ($files as $logfile) {
             $filename = basename($logfile);
             if ($filename != Helpers::getCurrentLogName()) {
-                $this->startSyncFile($logfile);
+                Helpers::moveFileToSyncing($logfile);
             }
         }
     }
 
-    private function startSyncFile($logfile)
+    private function startSyncingAllLogs()
     {
-        if ($this->moveFileToSyncing($logfile)) {
-            $this->postLogFileToServer(Helpers::getCurrentLogState(Constants::CURRENT_SYNCING_FILE));
+        $files = File::allFiles(Helpers::getCurrentSyncingDirectory());
+        foreach ($files as $logfile) {
+            $this->postLogFileToServer($logfile);
         }
     }
 
@@ -124,22 +131,9 @@ class AutoSyncingCommand extends Command {
         ]);
         if ($res->getStatusCode() == 200) {
             logger("auto sync success on file {$filename}");
+            Helpers::moveFileToSynced($logfile);
         } else {
             logger("auto sync fail on file {$filename}");
-        }
-    }
-
-    private function moveFileToSyncing($logfile)
-    {
-        $filename    = basename($logfile);
-        $syncingfile = Helpers::getCurrentSyncingDirectory() . '/' . $filename;
-        logger("Moving logfile {$filename}");
-        if (!File::move($logfile, $syncingfile)) {
-            logger("Couldn't move file {$filename}");
-            return FALSE;
-        } else {
-            Helpers::setCurrentLogState(Constants::CURRENT_SYNCING_FILE, $syncingfile);
-            return TRUE;
         }
     }
 

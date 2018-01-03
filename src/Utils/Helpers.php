@@ -125,6 +125,35 @@ class Helpers {
         return $data->get($key);
     }
 
+    static function moveFileToSyncing($logfile)
+    {
+        $filename    = basename($logfile);
+        $syncingfile = static::getCurrentSyncingDirectory() . '/' . $filename;
+        logger("Moving logfile {$filename} to syncing folder.");
+        if (File::move($logfile, $syncingfile)) {
+            logger("{$filename} file moved to syncing folder.");
+            //Helpers::setCurrentLogState(Constants::CURRENT_SYNCING_FILE, $syncingfile);
+            return TRUE;
+        } else {
+            logger("Couldn't move file {$filename} to syncing folder.");
+            return FALSE;
+        }
+    }
+
+    static function moveFileToSynced($logfile)
+    {
+        $filename   = basename($logfile);
+        $syncedfile = static::getSyncedDirectory() . '/' . $filename;
+        logger("Moving logfile {$filename} to synced folder.");
+        if (File::move($logfile, $syncedfile)) {
+            logger("{$filename} file moved to synced folder.");
+            return TRUE;
+        } else {
+            logger("Couldn't move file {$filename} to synced folder.");
+            return FALSE;
+        }
+    }
+
     static function setEnvironmentValue($data = array())
     {
         $envPath = base_path('.env');

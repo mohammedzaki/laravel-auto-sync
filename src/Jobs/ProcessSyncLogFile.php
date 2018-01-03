@@ -66,13 +66,14 @@ class ProcessSyncLogFile implements ShouldQueue {
     {
         Helpers::decryptLogFile($this->logFilePath);
         $filename = basename($this->logFilePath);
-        $content  = File::get($this->logFilePath);
+        $sqlLogs  = File::get($this->logFilePath);
         logger("ProcessSyncLogFile staring insert to database from file: '{$filename}'");
         DB::beginTransaction();
         try {
-            DB::statement($content);
+            DB::statement($sqlLogs);
             DB::commit();
             logger("ProcessSyncLogFile insert to database success from file: '{$filename}'");
+            Helpers::moveFileToSynced($this->logFilePath);
         } catch (\Exception $exc) {
             DB::rollBack();
             logger($exc->getTraceAsString());
