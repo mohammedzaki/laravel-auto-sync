@@ -98,11 +98,13 @@ class AutoSyncConfigCommand extends Command {
     {
         $this->serverId   = $this->option(AutoSyncConfigCommand::SERVER_ID);
         $this->serverName = $this->option(AutoSyncConfigCommand::SERVER_NAME);
-        $this->folderCreator->createAllFolders();
         Helpers::setEnvironmentValue([
             Constants::ENV_AUTO_SYNC_SERVER_ID   => $this->serverId,
             Constants::ENV_AUTO_SYNC_SERVER_NAME => $this->serverName
         ]);
+        config([Constants::SERVER_ID => $this->serverId]);
+        config([Constants::SERVER_NAME => $this->serverName]);
+        $this->folderCreator->createAllFolders();
         $this->info('Auto-sync library has been initialized.');
     }
 
