@@ -55,7 +55,7 @@ class SyncFilesCommand extends Command
      * @var string
      */
     protected $signature = 'autosync:sync-files'
-            . '{--' . static::FILE_NAME . '= : The NAME of the file or all}';
+            . '{--' . SyncFilesCommand::FILE_NAME . '= : The NAME of the file or all}';
 
     /**
      * The console command description.
@@ -89,9 +89,9 @@ class SyncFilesCommand extends Command
      */
     public function handle()
     {   
-        $this->fileName = $this->option(static::FILE_NAME);
+        $this->fileName = $this->option(SyncFilesCommand::FILE_NAME);
         if (empty($this->fileName)) {
-            die('fileName (--' . static::FILE_NAME . ') Required');
+            die('fileName (--' . SyncFilesCommand::FILE_NAME . ') Required');
         } elseif ($this->fileName == 'all') {
             $this->startSyncingAllLogs();
         } else {
