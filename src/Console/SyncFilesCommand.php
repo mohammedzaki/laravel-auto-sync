@@ -91,7 +91,7 @@ class SyncFilesCommand extends Command
     {   
         $this->fileName = $this->option(SyncFilesCommand::FILE_NAME);
         if (empty($this->fileName)) {
-            die('fileName (--' . SyncFilesCommand::FILE_NAME . ') Required');
+            die('fileName (--' . SyncFilesCommand::FILE_NAME . ') Required \n');
         } elseif ($this->fileName == 'all') {
             $this->startSyncingAllLogs();
         } else {
@@ -103,7 +103,6 @@ class SyncFilesCommand extends Command
     {
         $logfile = Helpers::getCurrentSyncingDirectory() . "/{$fileName}";
         $this->insertLogFileToServer($logfile);
-        sleep(30);
     }
 
     private function startSyncingAllLogs()
@@ -111,7 +110,6 @@ class SyncFilesCommand extends Command
         $files = File::allFiles(Helpers::getCurrentSyncingDirectory());
         foreach ($files as $logfile) {
             $this->insertLogFileToServer($logfile);
-            sleep(30);
         }
     }
 

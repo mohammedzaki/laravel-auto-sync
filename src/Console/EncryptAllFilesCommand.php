@@ -91,7 +91,7 @@ class EncryptAllFilesCommand extends Command
     {   
         $this->fileName = $this->option(EncryptAllFilesCommand::FILE_NAME);
         if (empty($this->fileName)) {
-            die('fileName (--' . EncryptAllFilesCommand::FILE_NAME . ') Required');
+            die('fileName (--' . EncryptAllFilesCommand::FILE_NAME . ') Required \n');
         } elseif ($this->fileName == 'all') {
             $this->startSyncingAllLogs();
         } else {
@@ -103,7 +103,6 @@ class EncryptAllFilesCommand extends Command
     {
         $logfile = Helpers::getCurrentSyncingDirectory() . "/{$fileName}";
         $this->encryptLogFile($logfile);
-        sleep(30);
     }
 
     private function startSyncingAllLogs()
@@ -111,7 +110,6 @@ class EncryptAllFilesCommand extends Command
         $files = File::allFiles(Helpers::getCurrentSyncingDirectory());
         foreach ($files as $logfile) {
             $this->encryptLogFile($logfile);
-            sleep(30);
         }
     }
 
