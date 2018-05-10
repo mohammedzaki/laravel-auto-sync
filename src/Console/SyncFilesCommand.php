@@ -101,7 +101,7 @@ class SyncFilesCommand extends Command
 
     private function startSyncingLogFile($fileName)
     {
-        $logfile = File::allFiles(Helpers::getCurrentSyncingDirectory() . "/{$fileName}");
+        $logfile = File::File(Helpers::getCurrentSyncingDirectory() . "/{$fileName}");
         $this->insertLogFileToServer($logfile);
         sleep(30);
     }
