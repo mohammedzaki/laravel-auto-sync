@@ -54,7 +54,7 @@ class SyncFilesCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'autosync:sync-files'
+    protected $signature = 'autosync:sync-files '
             . '{--' . SyncFilesCommand::FILE_NAME . '= : The NAME of the file or all}';
 
     /**
