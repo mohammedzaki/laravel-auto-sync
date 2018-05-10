@@ -37,7 +37,7 @@ use File;
  *
  * @author Mohammed Zaki mohammedzaki.dev@gmail.com
  */
-class SyncFilesCommand extends Command
+class EncryptAllFilesCommand extends Command
 {
 
     const FILE_NAME = 'file-name';
@@ -54,15 +54,15 @@ class SyncFilesCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'autosync:sync-files '
-            . '{--' . SyncFilesCommand::FILE_NAME . '= : The NAME of the file or all}';
+    protected $signature = 'autosync:encrypt-files '
+            . '{--' . EncryptAllFilesCommand::FILE_NAME . '= : The NAME of the file or all}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'start auto sync process on all files or specified file';
+    protected $description = 'encrypt all files or specified file of sync process';
 
     /**
      * Server Name.
@@ -89,9 +89,9 @@ class SyncFilesCommand extends Command
      */
     public function handle()
     {   
-        $this->fileName = $this->option(SyncFilesCommand::FILE_NAME);
+        $this->fileName = $this->option(EncryptAllFilesCommand::FILE_NAME);
         if (empty($this->fileName)) {
-            die('fileName (--' . SyncFilesCommand::FILE_NAME . ') Required');
+            die('fileName (--' . EncryptAllFilesCommand::FILE_NAME . ') Required');
         } elseif ($this->fileName == 'all') {
             $this->startSyncingAllLogs();
         } else {
@@ -102,7 +102,7 @@ class SyncFilesCommand extends Command
     private function startSyncingLogFile($fileName)
     {
         $logfile = Helpers::getCurrentSyncingDirectory() . "/{$fileName}";
-        $this->insertLogFileToServer($logfile);
+        $this->encryptLogFile($logfile);
         sleep(30);
     }
 
@@ -110,7 +110,7 @@ class SyncFilesCommand extends Command
     {
         $files = File::allFiles(Helpers::getCurrentSyncingDirectory());
         foreach ($files as $logfile) {
-            $this->insertLogFileToServer($logfile);
+            $this->encryptLogFile($logfile);
             sleep(30);
         }
     }
@@ -120,22 +120,9 @@ class SyncFilesCommand extends Command
      *
      * @return void
      */
-    public function insertLogFileToServer($logfile)
+    public function encryptLogFile($logfile)
     {
-        Helpers::decryptLogFile($logfile);
-        $filename = basename($logfile);
-        $sqlLogs  = File::get($logfile);
-        logger("ProcessSyncLogFile staring insert to database from file: '{$filename}'");
-        DB::beginTransaction();
-        try {
-            DB::statement($sqlLogs);
-            DB::commit();
-            logger("ProcessSyncLogFile insert to database success from file: '{$filename}'");
-            Helpers::moveFileToSynced($logfile);
-        } catch (\Exception $exc) {
-            DB::rollBack();
-            logger($exc->getTraceAsString());
-        }
+        Helpers::encryptLogFile($logfile);
     }
 
 }

@@ -33,6 +33,7 @@ use AutoSync\Console\AutoSyncConfigCommand;
 use AutoSync\Console\AutoSyncingCommand;
 use AutoSync\Console\AutoSyncResetCommand;
 use AutoSync\Console\SyncFilesCommand;
+use AutoSync\Console\EncryptAllFilesCommand;
 use Illuminate\Console\Scheduling\Schedule;
 use AutoSync\Utils\Constants;
 
@@ -154,7 +155,8 @@ class AutoSyncServiceProvider extends ServiceProvider {
                 AutoSyncConfigCommand::class,
                 AutoSyncingCommand::class,
                 AutoSyncResetCommand::class,
-                SyncFilesCommand::class
+                SyncFilesCommand::class,
+                EncryptAllFilesCommand::class
             ]);
         }
     }
