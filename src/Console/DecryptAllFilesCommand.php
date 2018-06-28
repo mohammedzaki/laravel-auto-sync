@@ -54,7 +54,7 @@ class EncryptAllFilesCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'autosync:encrypt-files '
+    protected $signature = 'autosync:decrypt-files '
             . '{--' . EncryptAllFilesCommand::FILE_NAME . '= : The NAME of the file or all}';
 
     /**
@@ -62,7 +62,7 @@ class EncryptAllFilesCommand extends Command
      *
      * @var string
      */
-    protected $description = 'encrypt all files or specified file of sync process';
+    protected $description = 'decrypt all files or specified file of sync process';
 
     /**
      * Server Name.
@@ -88,7 +88,7 @@ class EncryptAllFilesCommand extends Command
      * @return mixed
      */
     public function handle()
-    {
+    {   
         $this->fileName = $this->option(EncryptAllFilesCommand::FILE_NAME);
         if (empty($this->fileName)) {
             die('fileName (--' . EncryptAllFilesCommand::FILE_NAME . ') Required \n');
@@ -109,7 +109,7 @@ class EncryptAllFilesCommand extends Command
     {
         $files = File::allFiles(Helpers::getCurrentSyncingDirectory());
         foreach ($files as $logfile) {
-            Helpers::encryptLogFile($logfile);
+            Helpers::decryptLogFile($logfile);
         }
     }
 
