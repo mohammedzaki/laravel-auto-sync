@@ -32,6 +32,8 @@ use AutoSync\SqlLogger;
 use AutoSync\Console\AutoSyncConfigCommand;
 use AutoSync\Console\AutoSyncingCommand;
 use AutoSync\Console\AutoSyncResetCommand;
+use AutoSync\Console\SyncFilesCommand;
+use AutoSync\Console\EncryptAllFilesCommand;
 use Illuminate\Console\Scheduling\Schedule;
 use AutoSync\Utils\Constants;
 
@@ -152,7 +154,9 @@ class AutoSyncServiceProvider extends ServiceProvider {
             $this->commands([
                 AutoSyncConfigCommand::class,
                 AutoSyncingCommand::class,
-                AutoSyncResetCommand::class
+                AutoSyncResetCommand::class,
+                SyncFilesCommand::class,
+                EncryptAllFilesCommand::class
             ]);
         }
     }

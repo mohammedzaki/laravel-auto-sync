@@ -76,7 +76,8 @@ class ProcessSyncLogFile implements ShouldQueue {
             Helpers::moveFileToSynced($this->logFilePath);
         } catch (\Exception $exc) {
             DB::rollBack();
-            logger($exc->getTraceAsString());
+            Helpers::encryptLogFile($this->logFilePath);
+            logger("auto-sync error at file '{$filename}': {$exc->getMessage()}");
         }
     }
 
