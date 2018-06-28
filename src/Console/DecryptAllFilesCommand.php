@@ -37,7 +37,7 @@ use File;
  *
  * @author Mohammed Zaki mohammedzaki.dev@gmail.com
  */
-class EncryptAllFilesCommand extends Command
+class DecryptAllFilesCommand extends Command
 {
 
     const FILE_NAME = 'file-name';
@@ -55,7 +55,7 @@ class EncryptAllFilesCommand extends Command
      * @var string
      */
     protected $signature = 'autosync:decrypt-files '
-            . '{--' . EncryptAllFilesCommand::FILE_NAME . '= : The NAME of the file or all}';
+            . '{--' . DecryptAllFilesCommand::FILE_NAME . '= : The NAME of the file or all}';
 
     /**
      * The console command description.
@@ -89,9 +89,9 @@ class EncryptAllFilesCommand extends Command
      */
     public function handle()
     {   
-        $this->fileName = $this->option(EncryptAllFilesCommand::FILE_NAME);
+        $this->fileName = $this->option(DecryptAllFilesCommand::FILE_NAME);
         if (empty($this->fileName)) {
-            die('fileName (--' . EncryptAllFilesCommand::FILE_NAME . ') Required \n');
+            die('fileName (--' . DecryptAllFilesCommand::FILE_NAME . ') Required \n');
         } elseif ($this->fileName == 'all') {
             $this->startSyncingAllLogs();
         } else {
