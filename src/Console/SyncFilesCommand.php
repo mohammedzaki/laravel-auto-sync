@@ -40,7 +40,9 @@ use File;
 class SyncFilesCommand extends Command
 {
 
-    const FILE_NAME = 'file-name';
+    const FILE_NAME           = 'file-name';
+    const WITHOUT_DECRYPT     = 'without-decrypt';
+    const INSERT_LINE_BY_LINE = 'line-by-line';
 
     /**
      * SetupFolders .
@@ -55,7 +57,9 @@ class SyncFilesCommand extends Command
      * @var string
      */
     protected $signature = 'autosync:sync-files '
-            . '{--' . SyncFilesCommand::FILE_NAME . '= : The NAME of the file or all}';
+            . '{--' . SyncFilesCommand::FILE_NAME . '= : The NAME of the file or all}'
+            . '{--' . SyncFilesCommand::WITHOUT_DECRYPT . '}'
+            . '{--' . SyncFilesCommand::INSERT_LINE_BY_LINE . ' }';
 
     /**
      * The console command description.
@@ -70,6 +74,14 @@ class SyncFilesCommand extends Command
      * @var string
      */
     protected $fileName;
+
+    /**
+     * Server Name.
+     *
+     * @var string
+     */
+    protected $withoutDecrypt;
+    protected $insertLineByLine;
 
     /**
      * Create a new command instance.
@@ -88,10 +100,12 @@ class SyncFilesCommand extends Command
      * @return mixed
      */
     public function handle()
-    {   
-        $this->fileName = $this->option(SyncFilesCommand::FILE_NAME);
+    {
+        $this->fileName         = $this->option(SyncFilesCommand::FILE_NAME);
+        $this->withoutDecrypt   = $this->option(SyncFilesCommand::WITHOUT_DECRYPT);
+        $this->insertLineByLine = $this->option(SyncFilesCommand::INSERT_LINE_BY_LINE);
         if (empty($this->fileName)) {
-            die('fileName (--' . SyncFilesCommand::FILE_NAME . ') Required \n');
+            $this->startSyncingAllLogs();
         } elseif ($this->fileName == 'all') {
             $this->startSyncingAllLogs();
         } else {
@@ -108,6 +122,7 @@ class SyncFilesCommand extends Command
     private function startSyncingAllLogs()
     {
         $files = File::allFiles(Helpers::getCurrentSyncingDirectory());
+        sort($files);
         foreach ($files as $logfile) {
             $this->insertLogFileToServer($logfile);
         }
@@ -120,7 +135,23 @@ class SyncFilesCommand extends Command
      */
     public function insertLogFileToServer($logfile)
     {
-        Helpers::decryptLogFile($logfile);
+        if (!$this->withoutDecrypt) {
+            Helpers::decryptLogFile($logfile);
+        }
+        if ($this->insertLineByLine) {
+            $this->insertLogFileToServerLineByLine($logfile);
+        } else {
+            $this->insertWholeLogFileToServer($logfile);
+        }
+    }
+
+    /**
+     * Execute the job.
+     *
+     * @return void
+     */
+    public function insertWholeLogFileToServer($logfile)
+    {
         $filename = basename($logfile);
         $sqlLogs  = File::get($logfile);
         logger("ProcessSyncLogFile staring insert to database from file: '{$filename}'");
@@ -132,8 +163,30 @@ class SyncFilesCommand extends Command
             Helpers::moveFileToSynced($logfile);
         } catch (\Exception $exc) {
             DB::rollBack();
-            logger($exc->getTraceAsString());
+            logger($exc->getMessage());
         }
+    }
+
+    /**
+     * Execute the job.
+     *
+     * @return void
+     */
+    public function insertLogFileToServerLineByLine($logfile)
+    {
+        $filename = basename($logfile);
+        //$sqlLogs  = File::get($logfile);
+        logger("ProcessSyncLogFile staring insert to database from file: '{$filename}'");
+        foreach(file($logfile) as $sql) {
+            try {
+                DB::statement($sql);
+                //logger("Sql: {$sql}");
+            } catch (\Exception $exc) {
+                
+            }
+        }
+        logger("ProcessSyncLogFile insert to database success from file: '{$filename}'");
+        Helpers::moveFileToSynced($logfile);
     }
 
 }

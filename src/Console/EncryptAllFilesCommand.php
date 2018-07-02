@@ -29,7 +29,6 @@ namespace AutoSync\Console;
 use Illuminate\Console\Command;
 use AutoSync\Filesystem\FolderCreator;
 use AutoSync\Utils\Helpers;
-use DB;
 use File;
 
 /**
@@ -91,7 +90,7 @@ class EncryptAllFilesCommand extends Command
     {
         $this->fileName = $this->option(EncryptAllFilesCommand::FILE_NAME);
         if (empty($this->fileName)) {
-            die('fileName (--' . EncryptAllFilesCommand::FILE_NAME . ') Required \n');
+            $this->startSyncingAllLogs();
         } elseif ($this->fileName == 'all') {
             $this->startSyncingAllLogs();
         } else {
@@ -108,6 +107,7 @@ class EncryptAllFilesCommand extends Command
     private function startSyncingAllLogs()
     {
         $files = File::allFiles(Helpers::getCurrentSyncingDirectory());
+        sort($files);
         foreach ($files as $logfile) {
             Helpers::encryptLogFile($logfile);
         }

@@ -29,7 +29,6 @@ namespace AutoSync\Console;
 use Illuminate\Console\Command;
 use AutoSync\Filesystem\FolderCreator;
 use AutoSync\Utils\Helpers;
-use DB;
 use File;
 
 /**
@@ -91,7 +90,7 @@ class DecryptAllFilesCommand extends Command
     {   
         $this->fileName = $this->option(DecryptAllFilesCommand::FILE_NAME);
         if (empty($this->fileName)) {
-            die('fileName (--' . DecryptAllFilesCommand::FILE_NAME . ') Required \n');
+            $this->startSyncingAllLogs();
         } elseif ($this->fileName == 'all') {
             $this->startSyncingAllLogs();
         } else {
@@ -108,8 +107,13 @@ class DecryptAllFilesCommand extends Command
     private function startSyncingAllLogs()
     {
         $files = File::allFiles(Helpers::getCurrentSyncingDirectory());
+        sort($files);
         foreach ($files as $logfile) {
-            Helpers::decryptLogFile($logfile);
+            try {
+                Helpers::decryptLogFile($logfile);
+            } catch (\Exception $exc) {
+                echo "error at file {$logfile}: {$exc->getMessage()} \n ";
+            }
         }
     }
 
