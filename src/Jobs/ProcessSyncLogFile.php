@@ -32,10 +32,14 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use AutoSync\Utils\Helpers;
+use AutoSync\Console\SyncFilesCommand;
+use Exception;
+use Artisan;
 use File;
 use DB;
 
-class ProcessSyncLogFile implements ShouldQueue {
+class ProcessSyncLogFile implements ShouldQueue
+{
 
     use Dispatchable,
         InteractsWithQueue,
@@ -43,9 +47,21 @@ class ProcessSyncLogFile implements ShouldQueue {
         SerializesModels;
 
     /**
+     * The number of times the job may be attempted.
+     *
+     * @var int
+     */
+    public $tries = 3;
+
+    /**
      * @var string Description
      */
     private $logFilePath;
+
+    /**
+     * @var string Description
+     */
+    private $logFileName;
 
     /**
      * Create a new job instance.
@@ -55,6 +71,7 @@ class ProcessSyncLogFile implements ShouldQueue {
     public function __construct(string $logFilePath)
     {
         $this->logFilePath = $logFilePath;
+        $this->logFileName = basename($logFilePath);
     }
 
     /**
@@ -65,20 +82,42 @@ class ProcessSyncLogFile implements ShouldQueue {
     public function handle()
     {
         Helpers::decryptLogFile($this->logFilePath);
-        $filename = basename($this->logFilePath);
-        $sqlLogs  = File::get($this->logFilePath);
-        logger("ProcessSyncLogFile staring insert to database from file: '{$filename}'");
+        $sqlLogs = File::get($this->logFilePath);
+        logger("ProcessSyncLogFile staring insert to database from file: '{$this->logFileName}'");
         DB::beginTransaction();
-        try {
-            DB::statement($sqlLogs);
-            DB::commit();
-            logger("ProcessSyncLogFile insert to database success from file: '{$filename}'");
-            Helpers::moveFileToSynced($this->logFilePath);
-        } catch (\Exception $exc) {
-            DB::rollBack();
-            Helpers::encryptLogFile($this->logFilePath);
-            logger("auto-sync error at file '{$filename}': {$exc->getMessage()}");
+        DB::statement($sqlLogs);
+        DB::commit();
+        logger("ProcessSyncLogFile insert to database success from file: '{$this->logFileName}'");
+        Helpers::moveFileToSynced($this->logFilePath);
+    }
+
+    /**
+     * The job failed to process.
+     *
+     * @param  Exception  $exception
+     * @return void
+     */
+    public function failed(Exception $exception)
+    {
+        DB::rollBack();
+        Helpers::encryptLogFile($this->logFilePath);
+        logger("auto-sync error at file '{$this->logFileName}': {$exception->getMessage()}");
+        if ($this->attempts() == $this->tries) {
+            logger("auto-sync file '{$this->logFileName}' has been forced sync");
+            Artisan::call("autosync:sync-files --line-by-line", [
+                SyncFilesCommand::FILE_NAME => $this->logFileName
+            ]);
         }
+    }
+
+    /**
+     * Get the tags that should be assigned to the job.
+     *
+     * @return array
+     */
+    public function tags()
+    {
+        return ['autosync', 'autosync-file:' .$this->logFileName];
     }
 
 }

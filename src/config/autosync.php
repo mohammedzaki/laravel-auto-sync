@@ -17,25 +17,25 @@ return [
         'url'           => env('AUTO_SYNC_MASTER_SERVER_URL', ''),
         'username'      => env('AUTO_SYNC_MASTER_SERVER_USERNAME', ''),
         'password'      => env('AUTO_SYNC_MASTER_SERVER_PASSWORD', ''),
-        'sync_api_name' => '/api/autosync/pushNewSyncFile',
+        'sync_api_name' => env('AUTO_SYNC_API_NAME', '/api/autosync/pushNewSyncFile'),
     ],
-    'main_folder'        => storage_path('sync'),
+    'main_folder'        => env('AUTO_SYNC_MAIN_FOLDER', storage_path('sync')),
     'channel'            => env('AUTO_SYNC_SERVER_NAME', 'server-name') . '-' . env('AUTO_SYNC_SERVER_ID', 00),
     'folders'            => [
-        'current_logger'  => 'logger',
-        'current_syncing' => 'syncing',
-        'synced'          => 'synced'
+        'current_logger'  => env('AUTO_SYNC_CURRENT_LOGGER_FOLDER', 'logger'),
+        'current_syncing' => env('AUTO_SYNC_CURRENT_SYNCING_FOLDER', 'syncing'),
+        'synced'          => env('AUTO_SYNC_SYNCED_FILES_FOLDER', 'synced')
     ],
-    'sync_schedule_time' => '*/30 */3 * * * *',
+    'sync_schedule_time' => env('AUTO_SYNC_SCHEDULE_TIME', '*/2 * * * * *'),
     'sync_queue'         => [
-        'name'   => 'AutoSyncProcessing',
-        'driver' => 'database',
-        'delay'  => 5,
+        'name'   => env('AUTO_SYNC_QUEUE_NAME', 'AutoSyncProcessing'),
+        'driver' => env('AUTO_SYNC_QUEUE_DRIVER', 'database'),
+        'delay'  => env('AUTO_SYNC_QUEUE_DELAY', 5),
     ],
     'file'               => [
-        'prefix'        => 'bin',
-        'current_state' => 'current',
-        'max_records'   => '50',
+        'prefix'        => env('AUTO_SYNC_FILE_PREFIX', 'bin'),
+        'current_state' => env('AUTO_SYNC_CURRENT_STATE_FILENAME', 'current'),
+        'max_records'   => env('AUTO_SYNC_MAX_RECORDS', '10'),
     ],
     'ignored_tables'     => [
         '`oauth_access_tokens`',
@@ -45,6 +45,12 @@ return [
         '`oauth_refresh_tokens`',
         '`password_resets`',
         '`migrations`',
+        '`permissions`',
+        '`roles`',
+        '`permission_role`',
+        '`role_user`',
         '`jobs`',
+        '`users`',
+        '`notifications`'
     ]
 ];

@@ -29,7 +29,6 @@ namespace AutoSync\Console;
 use Illuminate\Console\Command;
 use AutoSync\Filesystem\FolderCreator;
 use AutoSync\Utils\Helpers;
-use DB;
 use File;
 
 /**
@@ -37,7 +36,7 @@ use File;
  *
  * @author Mohammed Zaki mohammedzaki.dev@gmail.com
  */
-class EncryptAllFilesCommand extends Command
+class DecryptAllFilesCommand extends Command
 {
 
     const FILE_NAME = 'file-name';
@@ -55,7 +54,7 @@ class EncryptAllFilesCommand extends Command
      * @var string
      */
     protected $signature = 'autosync:decrypt-files '
-            . '{--' . EncryptAllFilesCommand::FILE_NAME . '= : The NAME of the file or all}';
+            . '{--' . DecryptAllFilesCommand::FILE_NAME . '= : The NAME of the file or all}';
 
     /**
      * The console command description.
@@ -89,9 +88,9 @@ class EncryptAllFilesCommand extends Command
      */
     public function handle()
     {   
-        $this->fileName = $this->option(EncryptAllFilesCommand::FILE_NAME);
+        $this->fileName = $this->option(DecryptAllFilesCommand::FILE_NAME);
         if (empty($this->fileName)) {
-            die('fileName (--' . EncryptAllFilesCommand::FILE_NAME . ') Required \n');
+            $this->startSyncingAllLogs();
         } elseif ($this->fileName == 'all') {
             $this->startSyncingAllLogs();
         } else {
@@ -108,8 +107,13 @@ class EncryptAllFilesCommand extends Command
     private function startSyncingAllLogs()
     {
         $files = File::allFiles(Helpers::getCurrentSyncingDirectory());
+        sort($files);
         foreach ($files as $logfile) {
-            Helpers::decryptLogFile($logfile);
+            try {
+                Helpers::decryptLogFile($logfile);
+            } catch (\Exception $exc) {
+                echo "error at file {$logfile}: {$exc->getMessage()} \n ";
+            }
         }
     }
 
