@@ -59,6 +59,11 @@ class ProcessSyncLogFile implements ShouldQueue
     private $logFilePath;
 
     /**
+     * @var string Description
+     */
+    private $logFileName;
+
+    /**
      * Create a new job instance.
      *
      * @return void
@@ -66,6 +71,7 @@ class ProcessSyncLogFile implements ShouldQueue
     public function __construct(string $logFilePath)
     {
         $this->logFilePath = $logFilePath;
+        $this->logFileName = basename($logFilePath);
     }
 
     /**
@@ -76,13 +82,12 @@ class ProcessSyncLogFile implements ShouldQueue
     public function handle()
     {
         Helpers::decryptLogFile($this->logFilePath);
-        $filename = basename($this->logFilePath);
-        $sqlLogs  = File::get($this->logFilePath);
-        logger("ProcessSyncLogFile staring insert to database from file: '{$filename}'");
+        $sqlLogs = File::get($this->logFilePath);
+        logger("ProcessSyncLogFile staring insert to database from file: '{$this->logFileName}'");
         DB::beginTransaction();
         DB::statement($sqlLogs);
         DB::commit();
-        logger("ProcessSyncLogFile insert to database success from file: '{$filename}'");
+        logger("ProcessSyncLogFile insert to database success from file: '{$this->logFileName}'");
         Helpers::moveFileToSynced($this->logFilePath);
     }
 
@@ -95,15 +100,24 @@ class ProcessSyncLogFile implements ShouldQueue
     public function failed(Exception $exception)
     {
         DB::rollBack();
-        $filename = basename($this->logFilePath);
         Helpers::encryptLogFile($this->logFilePath);
-        logger("auto-sync error at file '{$filename}': {$exc->getMessage()}");
+        logger("auto-sync error at file '{$this->logFileName}': {$exception->getMessage()}");
         if ($this->attempts() == $this->tries) {
-            logger("auto-sync file '{$filename}' has been forced sync");
+            logger("auto-sync file '{$this->logFileName}' has been forced sync");
             Artisan::call("autosync:sync-files --line-by-line", [
-                SyncFilesCommand::FILE_NAME => $this->logFilePath
+                SyncFilesCommand::FILE_NAME => $this->logFileName
             ]);
         }
+    }
+
+    /**
+     * Get the tags that should be assigned to the job.
+     *
+     * @return array
+     */
+    public function tags()
+    {
+        return ['autosync', 'autosync-file:' .$this->logFileName];
     }
 
 }
