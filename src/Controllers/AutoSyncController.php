@@ -63,6 +63,7 @@ class AutoSyncController extends Controller {
             $logFile = Input::file(Constants::API_LOG_FILE);
             $path    = Helpers::getCurrentSyncingDirectory() . '/' . $logFile->getClientOriginalName();
             File::put($path, File::get($logFile));
+            chmod($path, 0777);
             ProcessSyncLogFile::dispatch($path)
                     ->onConnection(config(Constants::SYNC_QUEUE_DRIVER))
                     ->onQueue(config(Constants::SYNC_QUEUE_NAME))

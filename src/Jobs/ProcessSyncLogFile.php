@@ -32,15 +32,26 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use AutoSync\Utils\Helpers;
+use AutoSync\Console\SyncFilesCommand;
+use Exception;
+use Artisan;
 use File;
 use DB;
 
-class ProcessSyncLogFile implements ShouldQueue {
+class ProcessSyncLogFile implements ShouldQueue
+{
 
     use Dispatchable,
         InteractsWithQueue,
         Queueable,
         SerializesModels;
+
+    /**
+     * The number of times the job may be attempted.
+     *
+     * @var int
+     */
+    public $tries = 3;
 
     /**
      * @var string Description
@@ -69,15 +80,29 @@ class ProcessSyncLogFile implements ShouldQueue {
         $sqlLogs  = File::get($this->logFilePath);
         logger("ProcessSyncLogFile staring insert to database from file: '{$filename}'");
         DB::beginTransaction();
-        try {
-            DB::statement($sqlLogs);
-            DB::commit();
-            logger("ProcessSyncLogFile insert to database success from file: '{$filename}'");
-            Helpers::moveFileToSynced($this->logFilePath);
-        } catch (\Exception $exc) {
-            DB::rollBack();
-            Helpers::encryptLogFile($this->logFilePath);
-            logger("auto-sync error at file '{$filename}': {$exc->getMessage()}");
+        DB::statement($sqlLogs);
+        DB::commit();
+        logger("ProcessSyncLogFile insert to database success from file: '{$filename}'");
+        Helpers::moveFileToSynced($this->logFilePath);
+    }
+
+    /**
+     * The job failed to process.
+     *
+     * @param  Exception  $exception
+     * @return void
+     */
+    public function failed(Exception $exception)
+    {
+        DB::rollBack();
+        $filename = basename($this->logFilePath);
+        Helpers::encryptLogFile($this->logFilePath);
+        logger("auto-sync error at file '{$filename}': {$exc->getMessage()}");
+        if ($this->attempts() == $this->tries) {
+            logger("auto-sync file '{$filename}' has been forced sync");
+            Artisan::call("autosync:sync-files --line-by-line", [
+                SyncFilesCommand::FILE_NAME => $this->logFilePath
+            ]);
         }
     }
 
