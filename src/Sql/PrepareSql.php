@@ -37,7 +37,7 @@ class PrepareSql {
     {
         
         foreach ($bindings as $binding) :
-            $sqlQuery = preg_replace("#\?#", is_numeric($binding) ? $binding : "'" . $binding . "'", $sqlQuery, 1);
+            $sqlQuery = preg_replace("#\?#", is_numeric($binding) ? $binding : '"' . $binding . '"', $sqlQuery, 1);
         endforeach;
         return $sqlQuery;
     }
