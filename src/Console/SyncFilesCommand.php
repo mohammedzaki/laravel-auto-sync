@@ -40,9 +40,10 @@ use File;
 class SyncFilesCommand extends Command
 {
 
-    const FILE_NAME           = 'file-name';
-    const WITHOUT_DECRYPT     = 'without-decrypt';
-    const INSERT_LINE_BY_LINE = 'line-by-line';
+    const FILE_NAME            = 'file-name';
+    const WITHOUT_DECRYPT      = 'without-decrypt';
+    const INSERT_LINE_BY_LINE  = 'line-by-line';
+    const RE_SYNC_SYNCED_FILES = 're-sync-synced-files';
 
     /**
      * SetupFolders .
@@ -59,7 +60,8 @@ class SyncFilesCommand extends Command
     protected $signature = 'autosync:sync-files '
             . '{--' . SyncFilesCommand::FILE_NAME . '= : The NAME of the file or all}'
             . '{--' . SyncFilesCommand::WITHOUT_DECRYPT . '}'
-            . '{--' . SyncFilesCommand::INSERT_LINE_BY_LINE . ' }';
+            . '{--' . SyncFilesCommand::INSERT_LINE_BY_LINE . ' }'
+            . '{--' . SyncFilesCommand::RE_SYNC_SYNCED_FILES . ' }';
 
     /**
      * The console command description.
@@ -82,6 +84,7 @@ class SyncFilesCommand extends Command
      */
     protected $withoutDecrypt;
     protected $insertLineByLine;
+    protected $reSyncSycedFiles;
 
     /**
      * Create a new command instance.
@@ -104,6 +107,7 @@ class SyncFilesCommand extends Command
         $this->fileName         = $this->option(SyncFilesCommand::FILE_NAME);
         $this->withoutDecrypt   = $this->option(SyncFilesCommand::WITHOUT_DECRYPT);
         $this->insertLineByLine = $this->option(SyncFilesCommand::INSERT_LINE_BY_LINE);
+        $this->reSyncSycedFiles = $this->option(SyncFilesCommand::RE_SYNC_SYNCED_FILES);
         if (empty($this->fileName)) {
             $this->startSyncingAllLogs();
         } elseif ($this->fileName == 'all') {
@@ -113,15 +117,24 @@ class SyncFilesCommand extends Command
         }
     }
 
+    private function getWorkingDir()
+    {
+        if ($this->reSyncSycedFiles) {
+            return Helpers::getSyncedDirectory();
+        } else {
+            return Helpers::getCurrentSyncingDirectory();
+        }
+    }
+
     private function startSyncingLogFile($fileName)
     {
-        $logfile = Helpers::getCurrentSyncingDirectory() . "/{$fileName}";
+        $logfile = $this->getWorkingDir() . "/{$fileName}";
         $this->insertLogFileToServer($logfile);
     }
 
     private function startSyncingAllLogs()
     {
-        $files = File::allFiles(Helpers::getCurrentSyncingDirectory());
+        $files = File::allFiles($this->getWorkingDir());
         sort($files);
         foreach ($files as $logfile) {
             $this->insertLogFileToServer($logfile);
@@ -136,7 +149,11 @@ class SyncFilesCommand extends Command
     public function insertLogFileToServer($logfile)
     {
         if (!$this->withoutDecrypt) {
-            Helpers::decryptLogFile($logfile);
+            try {
+                Helpers::decryptLogFile($logfile);
+            } catch (\Exception $exc) {
+                logger($exc->getMessage());
+            }
         }
         if ($this->insertLineByLine) {
             $this->insertLogFileToServerLineByLine($logfile);
@@ -160,7 +177,9 @@ class SyncFilesCommand extends Command
             DB::statement($sqlLogs);
             DB::commit();
             logger("ProcessSyncLogFile insert to database success from file: '{$filename}'");
-            Helpers::moveFileToSynced($logfile);
+            if (!$this->reSyncSycedFiles) {
+                Helpers::moveFileToSynced($logfile);
+            }
         } catch (\Exception $exc) {
             DB::rollBack();
             logger($exc->getMessage());
@@ -177,7 +196,7 @@ class SyncFilesCommand extends Command
         $filename = basename($logfile);
         //$sqlLogs  = File::get($logfile);
         logger("ProcessSyncLogFile staring insert to database from file: '{$filename}'");
-        foreach(file($logfile) as $sql) {
+        foreach (file($logfile) as $sql) {
             try {
                 DB::statement($sql);
                 //logger("Sql: {$sql}");
@@ -186,7 +205,9 @@ class SyncFilesCommand extends Command
             }
         }
         logger("ProcessSyncLogFile insert to database success from file: '{$filename}'");
-        Helpers::moveFileToSynced($logfile);
+        if (!$this->reSyncSycedFiles) {
+            Helpers::moveFileToSynced($logfile);
+        }
     }
 
 }
